@@ -1,0 +1,1078 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tamil Radio</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" href="images/logo.png" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/png" href="images/logo.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #1a1520;
+        --bg2: #201b2c;
+        --card: #231e30;
+        --card-hover: #2a2540;
+        --accent: #c9a96e;
+        --accent2: #e8c99a;
+        --glow: rgba(201, 169, 110, 0.12);
+        --text: #ede8df;
+        --muted: #7a7090;
+        --border: #32294a;
+        --border-light: #3d3358;
+        --live: #9eb8a0;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        min-height: 100vh;
+        padding: 48px 24px 64px;
+        background-image:
+          radial-gradient(
+            ellipse at 15% 0%,
+            rgba(120, 80, 160, 0.12) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 85% 100%,
+            rgba(60, 40, 100, 0.15) 0%,
+            transparent 55%
+          ),
+          radial-gradient(
+            ellipse at 50% 50%,
+            rgba(201, 169, 110, 0.03) 0%,
+            transparent 70%
+          );
+      }
+
+      .topbar {
+        max-width: 1100px;
+        margin: 0 auto 52px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        position: relative;
+      }
+
+      .header-text .eyebrow {
+        font-size: 10px;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+        opacity: 0.8;
+      }
+
+      .header-text h1 {
+        font-family: "Cormorant Garamond", serif;
+        font-size: clamp(2.2rem, 5vw, 3.8rem);
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.01em;
+        color: var(--text);
+      }
+
+      .header-text h1 em {
+        font-style: italic;
+        color: var(--accent);
+      }
+
+      .header-text p {
+        color: var(--muted);
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 300;
+      }
+
+      .btn-add-station {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: transparent;
+        border: 1px solid var(--border-light);
+        color: var(--accent);
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        padding: 10px 18px;
+        border-radius: 100px;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+        margin-top: 8px;
+        white-space: nowrap;
+      }
+
+      .btn-add-station:hover {
+        background: var(--glow);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .btn-add-station svg {
+        width: 14px;
+        height: 14px;
+        fill: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+        gap: 18px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease,
+          background 0.25s ease;
+        opacity: 0;
+        animation: fadeUp 0.5s forwards;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: var(--border-light);
+        background: var(--card-hover);
+      }
+
+      .card.playing {
+        border-color: var(--accent);
+        box-shadow:
+          0 0 40px rgba(201, 169, 110, 0.1),
+          0 0 0 1px rgba(201, 169, 110, 0.05);
+      }
+
+      .card-img-wrap {
+        width: 100%;
+        height: 152px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .card-img-wrap img.station-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .card-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #28203c 0%, #1e1830 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .card-placeholder .ph-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(201, 169, 110, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card-placeholder .ph-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--accent);
+        opacity: 0.6;
+      }
+
+      .card-placeholder .ph-label {
+        font-size: 9px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--muted);
+        opacity: 0.6;
+      }
+
+      .card-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(26, 21, 32, 0.65) 0%,
+          transparent 60%
+        );
+        pointer-events: none;
+      }
+
+      .card-body {
+        padding: 18px 20px 20px;
+      }
+
+      .station-name {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 2px;
+        letter-spacing: -0.01em;
+      }
+
+      .station-freq {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 18px;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+      }
+
+      .controls {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .btn-play {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(201, 169, 110, 0.12);
+        border: 1px solid rgba(201, 169, 110, 0.25);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.2s,
+          transform 0.15s,
+          border-color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .btn-play:hover {
+        background: rgba(201, 169, 110, 0.25);
+        border-color: var(--accent);
+        transform: scale(1.08);
+      }
+
+      .btn-play.playing {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .btn-play svg {
+        fill: var(--accent);
+        width: 16px;
+        height: 16px;
+      }
+
+      .btn-play.playing svg {
+        fill: #1a1520;
+      }
+
+      .status-text {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 300;
+      }
+
+      .status-text.live {
+        color: var(--live);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .live-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--live);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .bars {
+        display: flex;
+        align-items: flex-end;
+        gap: 3px;
+        height: 20px;
+        margin-left: auto;
+      }
+
+      .bar {
+        width: 3px;
+        background: var(--accent);
+        border-radius: 2px;
+        opacity: 0;
+        animation: eq 0.8s infinite ease-in-out;
+      }
+
+      .card.playing .bar {
+        opacity: 1;
+      }
+
+      .bar:nth-child(1) {
+        animation-delay: 0s;
+      }
+      .bar:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .bar:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .bar:nth-child(4) {
+        animation-delay: 0.45s;
+      }
+
+      @keyframes eq {
+        0%,
+        100% {
+          height: 4px;
+        }
+        50% {
+          height: 18px;
+        }
+      }
+
+      /* ── MODAL ── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 8, 18, 0.78);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+      }
+
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal {
+        background: #231e32;
+        border: 1px solid var(--border-light);
+        border-radius: 22px;
+        width: 100%;
+        max-width: 430px;
+        padding: 32px;
+        transform: translateY(24px) scale(0.97);
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55);
+      }
+
+      .modal-overlay.open .modal {
+        transform: translateY(0) scale(1);
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 28px;
+      }
+
+      .modal-title {
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.65rem;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .modal-subtitle {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 300;
+        margin-top: 4px;
+      }
+
+      .btn-close {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border);
+        color: var(--muted);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        line-height: 1;
+        transition:
+          background 0.2s,
+          color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .btn-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text);
+      }
+
+      .form-group {
+        margin-bottom: 18px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      .form-group input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        padding: 12px 14px;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+
+      .form-group input::placeholder {
+        color: var(--muted);
+        opacity: 0.55;
+      }
+
+      .form-group input:focus {
+        border-color: var(--accent);
+        background: rgba(201, 169, 110, 0.05);
+      }
+
+      .form-hint {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+        opacity: 0.65;
+      }
+
+      .image-options {
+        display: flex;
+        gap: 10px;
+      }
+
+      .img-opt {
+        flex: 1;
+        padding: 10px 8px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+        font-family: "DM Sans", sans-serif;
+        font-size: 12px;
+        cursor: pointer;
+        text-align: center;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          color 0.2s;
+        letter-spacing: 0.02em;
+        user-select: none;
+      }
+
+      .img-opt.selected {
+        border-color: var(--accent);
+        background: rgba(201, 169, 110, 0.08);
+        color: var(--accent);
+      }
+
+      #imgUrlGroup {
+        display: none;
+      }
+      #imgUrlGroup.visible {
+        display: block;
+      }
+
+      .form-error {
+        font-size: 11px;
+        color: #c97070;
+        margin-bottom: 12px;
+        display: none;
+      }
+      .form-error.visible {
+        display: block;
+      }
+
+      .btn-submit {
+        width: 100%;
+        margin-top: 4px;
+        padding: 14px;
+        background: rgba(201, 169, 110, 0.15);
+        border: 1px solid rgba(201, 169, 110, 0.4);
+        border-radius: 12px;
+        color: var(--accent2);
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          border-color 0.2s,
+          transform 0.15s;
+      }
+
+      .btn-submit:hover {
+        background: rgba(201, 169, 110, 0.25);
+        border-color: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      /* ── VOLUME KNOB ── */
+      .volume-center {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 48px;
+        user-select: none;
+      }
+
+      .vol-label {
+        font-size: 9px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--muted);
+        opacity: 0.7;
+      }
+
+      .knob-wrap {
+        position: relative;
+        width: 56px;
+        height: 56px;
+        cursor: grab;
+      }
+
+      .knob-wrap:active {
+        cursor: grabbing;
+      }
+
+      .knob-track {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+          var(--border) 0deg,
+          var(--border) 30deg,
+          transparent 30deg,
+          transparent 330deg,
+          var(--border) 330deg
+        );
+      }
+
+      .knob-fill {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: conic-gradient(
+          transparent 0deg,
+          transparent 30deg,
+          var(--accent) 30deg,
+          var(--accent) 30deg,
+          transparent 30deg
+        );
+        transition: background 0.05s;
+      }
+
+      .knob-body {
+        position: absolute;
+        inset: 7px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 38% 35%, #2e2840, #1c1828);
+        border: 1px solid var(--border-light);
+        box-shadow:
+          0 2px 12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .knob-indicator {
+        width: 3px;
+        height: 10px;
+        background: var(--accent);
+        border-radius: 2px;
+        transform-origin: center 14px;
+        transform: rotate(-135deg);
+        transition: transform 0.05s;
+        opacity: 0.9;
+      }
+
+      .vol-pct {
+        font-size: 11px;
+        color: var(--accent);
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        min-width: 34px;
+        text-align: center;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 56px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 300;
+        letter-spacing: 0.08em;
+        opacity: 0.45;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="header-text">
+        <div class="eyebrow">Live Streaming</div>
+        <h1>Tamil <em>Radio</em></h1>
+        <p>Select a station to begin your evening</p>
+      </div>
+      <button class="btn-add-station" id="openModal">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+        </svg>
+        Add Station
+      </button>
+
+      <!-- Volume Knob -->
+      <div class="volume-center">
+        <div class="vol-label">Volume</div>
+        <div class="knob-wrap" id="knobWrap">
+          <div class="knob-track"></div>
+          <div class="knob-fill" id="knobFill"></div>
+          <div class="knob-body">
+            <div class="knob-indicator" id="knobIndicator"></div>
+          </div>
+        </div>
+        <div class="vol-pct" id="volPct">80%</div>
+      </div>
+    </div>
+
+    <div class="grid" id="radioGrid"></div>
+
+    <footer>All streams are live &nbsp;·&nbsp; Neelankarai, Chennai</footer>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">Add Station</div>
+            <div class="modal-subtitle">
+              Add a new radio stream to your collection
+            </div>
+          </div>
+          <button class="btn-close" id="closeModal">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label>Station Name *</label>
+          <input type="text" id="inputName" placeholder="e.g. Sun FM" />
+        </div>
+
+        <div class="form-group">
+          <label
+            >Frequency / Tag
+            <span style="opacity: 0.45">(optional)</span></label
+          >
+          <input type="text" id="inputFreq" placeholder="e.g. 101.9 FM" />
+        </div>
+
+        <div class="form-group">
+          <label>Stream URL *</label>
+          <input
+            type="url"
+            id="inputUrl"
+            placeholder="https://stream.example.com/live"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Station Image</label>
+          <div class="image-options" id="imgOpts">
+            <div class="img-opt selected" data-val="default">
+              Use Placeholder
+            </div>
+            <div class="img-opt" data-val="url">Image URL</div>
+          </div>
+        </div>
+
+        <div class="form-group" id="imgUrlGroup">
+          <label>Image URL</label>
+          <input
+            type="url"
+            id="inputImg"
+            placeholder="https://example.com/logo.jpg"
+          />
+          <div class="form-hint">
+            Direct link to a .jpg, .png, or .webp image
+          </div>
+        </div>
+
+        <div class="form-error" id="formError">
+          Please fill in the Station Name and Stream URL.
+        </div>
+
+        <button class="btn-submit" id="btnAddStation">Add to Collection</button>
+      </div>
+    </div>
+
+    <script>
+      const defaultStations = [
+        {
+          name: "Big FM",
+          freq: "92.7 FM",
+          url: "https://radios.crabdance.com:8002/4",
+          img: null,
+        },
+        {
+          name: "Suriyan FM",
+          freq: "93.5 FM",
+          url: "http://radios.crabdance.com:8002/2",
+          img: null,
+        },
+        {
+          name: "Radio Mirchi",
+          freq: "98.3 FM",
+          url: "https://radios.crabdance.com:8002/1",
+          img: null,
+        },
+        {
+          name: "Radio City",
+          freq: "91.1 FM",
+          url: "https://radios.crabdance.com:8002/5",
+          img: null,
+        },
+        {
+          name: "Hello FM",
+          freq: "106.4 FM",
+          url: "https://radios.crabdance.com:8002/3",
+          img: null,
+        },
+      ];
+
+      let stations = [...defaultStations];
+      let currentAudio = null;
+      let currentCard = null;
+
+      const grid = document.getElementById("radioGrid");
+
+      function makePlaceholder() {
+        return `<div class="card-placeholder">
+      <div class="ph-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+      </div>
+      <span class="ph-label">Station Image</span>
+    </div>`;
+      }
+
+      function buildCard(station, index) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.style.animationDelay = `${index * 70}ms`;
+
+        const imgSection = station.img
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
+          : makePlaceholder();
+
+        card.innerHTML = `
+      <div class="card-img-wrap">
+        ${imgSection}
+        <div class="card-overlay"></div>
+      </div>
+      <div class="card-body">
+        <div class="station-name">${station.name}</div>
+        <div class="station-freq">${station.freq || "Live Radio"}</div>
+        <div class="controls">
+          <button class="btn-play" title="Play ${station.name}">
+            <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <span class="status-text">Tap to play</span>
+          <div class="bars">
+            <div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div>
+          </div>
+        </div>
+      </div>`;
+
+        const btn = card.querySelector(".btn-play");
+        const statusText = card.querySelector(".status-text");
+        const iconPlay = card.querySelector(".icon-play");
+        const iconPause = card.querySelector(".icon-pause");
+
+        btn.addEventListener("click", () => {
+          const isPlaying = card.classList.contains("playing");
+
+          if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+          }
+          if (currentCard) resetCard(currentCard);
+
+          if (!isPlaying) {
+            const audio = new Audio(station.url);
+            audio.volume = volume;
+            audio.play().catch(() => {
+              statusText.textContent = "Unavailable";
+            });
+            currentAudio = audio;
+            currentCard = card;
+
+            card.classList.add("playing");
+            btn.classList.add("playing");
+            iconPlay.style.display = "none";
+            iconPause.style.display = "";
+            statusText.className = "status-text live";
+            statusText.innerHTML = '<div class="live-dot"></div> Live';
+
+            audio.addEventListener("error", () => {
+              resetCard(card);
+              statusText.textContent = "Stream error";
+              currentAudio = null;
+              currentCard = null;
+            });
+          } else {
+            currentCard = null;
+          }
+        });
+
+        return card;
+      }
+
+      function resetCard(card) {
+        card.classList.remove("playing");
+        const btn = card.querySelector(".btn-play");
+        btn.classList.remove("playing");
+        btn.querySelector(".icon-play").style.display = "";
+        btn.querySelector(".icon-pause").style.display = "none";
+        const s = card.querySelector(".status-text");
+        s.className = "status-text";
+        s.textContent = "Tap to play";
+      }
+
+      function renderAll() {
+        grid.innerHTML = "";
+        stations.forEach((s, i) => grid.appendChild(buildCard(s, i)));
+      }
+
+      renderAll();
+
+      /* ── MODAL LOGIC ── */
+      const overlay = document.getElementById("modalOverlay");
+      const formError = document.getElementById("formError");
+      const imgUrlGrp = document.getElementById("imgUrlGroup");
+      let imgMode = "default";
+
+      document
+        .getElementById("openModal")
+        .addEventListener("click", () => overlay.classList.add("open"));
+      document
+        .getElementById("closeModal")
+        .addEventListener("click", closeModal);
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) closeModal();
+      });
+
+      document.getElementById("imgOpts").addEventListener("click", (e) => {
+        const opt = e.target.closest(".img-opt");
+        if (!opt) return;
+        document
+          .querySelectorAll(".img-opt")
+          .forEach((o) => o.classList.remove("selected"));
+        opt.classList.add("selected");
+        imgMode = opt.dataset.val;
+        imgUrlGrp.classList.toggle("visible", imgMode === "url");
+      });
+
+      document.getElementById("btnAddStation").addEventListener("click", () => {
+        const name = document.getElementById("inputName").value.trim();
+        const url = document.getElementById("inputUrl").value.trim();
+
+        if (!name || !url) {
+          formError.classList.add("visible");
+          return;
+        }
+        formError.classList.remove("visible");
+
+        const freq = document.getElementById("inputFreq").value.trim();
+        const img =
+          imgMode === "url"
+            ? document.getElementById("inputImg").value.trim() || null
+            : null;
+
+        stations.push({ name, freq, url, img });
+        renderAll();
+        closeModal();
+      });
+
+      function closeModal() {
+        overlay.classList.remove("open");
+        ["inputName", "inputFreq", "inputUrl", "inputImg"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        imgMode = "default";
+        document
+          .querySelectorAll(".img-opt")
+          .forEach((o) =>
+            o.classList.toggle("selected", o.dataset.val === "default"),
+          );
+        imgUrlGrp.classList.remove("visible");
+        formError.classList.remove("visible");
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      /* ── VOLUME KNOB ── */
+      const knobWrap = document.getElementById("knobWrap");
+      const knobIndicator = document.getElementById("knobIndicator");
+      const knobFill = document.getElementById("knobFill");
+      const volPct = document.getElementById("volPct");
+
+      let volume = 0.8; // 0..1
+      let isDragging = false;
+      let dragStartY = 0;
+      let dragStartVol = 0;
+
+      // Min angle = -135deg (0%), Max angle = 135deg (100%)
+      function setVolume(v) {
+        volume = Math.min(1, Math.max(0, v));
+        if (currentAudio) currentAudio.volume = volume;
+
+        const pct = Math.round(volume * 100);
+        const angleDeg = -135 + volume * 270; // -135 to +135
+        knobIndicator.style.transform = `rotate(${angleDeg}deg)`;
+        volPct.textContent = pct + "%";
+
+        // Fill arc: starts at 30deg on the conic, covers 270deg total range
+        // active portion = volume * 270 degrees starting from 30deg
+        const startDeg = 30;
+        const fillEnd = startDeg + volume * 270;
+        knobFill.style.background = `conic-gradient(
+      transparent 0deg,
+      transparent ${startDeg}deg,
+      var(--accent) ${startDeg}deg,
+      var(--accent) ${fillEnd}deg,
+      transparent ${fillEnd}deg
+    )`;
+      }
+
+      knobWrap.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        dragStartY = e.clientY;
+        dragStartVol = volume;
+        e.preventDefault();
+      });
+
+      knobWrap.addEventListener(
+        "touchstart",
+        (e) => {
+          isDragging = true;
+          dragStartY = e.touches[0].clientY;
+          dragStartVol = volume;
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const dy = dragStartY - e.clientY; // drag up = louder
+        setVolume(dragStartVol + dy / 120);
+      });
+
+      document.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!isDragging) return;
+          const dy = dragStartY - e.touches[0].clientY;
+          setVolume(dragStartVol + dy / 120);
+        },
+        { passive: true },
+      );
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+      document.addEventListener("touchend", () => {
+        isDragging = false;
+      });
+
+      knobWrap.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          setVolume(volume - e.deltaY / 800);
+        },
+        { passive: false },
+      );
+
+      // Init
+      setVolume(0.8);
+    </script>
+  </body>
+</html>
