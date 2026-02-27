@@ -131,6 +131,10 @@
         fill: var(--accent);
       }
 
+      .hidden {
+        display: none !important;
+      }
+
       .top-actions {
         display: flex;
         flex-direction: column;
@@ -173,6 +177,48 @@
 
       .btn-auth.hidden {
         display: none;
+      }
+
+      .profile-wrap {
+        position: relative;
+      }
+
+      .btn-profile {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: 1px solid var(--border-light);
+        background: transparent;
+        padding: 0;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      .btn-profile img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .profile-popup {
+        position: absolute;
+        right: 0;
+        top: 46px;
+        min-width: 260px;
+        background: #231e32;
+        border: 1px solid var(--border-light);
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.42);
+        z-index: 120;
+      }
+
+      .profile-uid {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 10px;
+        word-break: break-all;
       }
 
       .grid {
@@ -802,6 +848,33 @@
         letter-spacing: 0.08em;
         opacity: 0.45;
       }
+
+      .toast-container {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 300;
+      }
+
+      .toast {
+        background: #231e32;
+        border: 1px solid var(--border-light);
+        color: var(--text);
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        min-width: 220px;
+        max-width: 340px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .toast.error {
+        border-color: rgba(201, 80, 80, 0.45);
+        color: #f1b8b8;
+      }
     </style>
   </head>
   <body>
@@ -812,18 +885,26 @@
         <p>Select a station to begin your evening</p>
       </div>
       <div class="top-actions">
-        <button class="btn-add-station" id="openModal">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
-          </svg>
-          Add Station
-        </button>
         <div class="auth-panel">
           <span class="auth-status" id="authStatus">Not signed in</span>
           <button type="button" class="btn-auth" id="btnSignIn">Sign In</button>
-          <button type="button" class="btn-auth hidden" id="btnSignOut">
-            Sign Out
-          </button>
+          <div class="profile-wrap">
+            <button type="button" class="btn-profile hidden" id="btnProfile">
+              <img
+                src="https://static.vecteezy.com/system/resources/previews/014/321/540/non_2x/radio-logo-template-icon-illustration-vector.jpg"
+                alt="Profile"
+              />
+            </button>
+            <div class="profile-popup hidden" id="profilePopup">
+              <div class="profile-uid" id="profileUid"></div>
+              <button type="button" class="btn-auth" id="openModal">
+                Add Station
+              </button>
+              <button type="button" class="btn-auth" id="btnSignOut">
+                Sign Out
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -964,6 +1045,7 @@
       ];
 
       const FIRESTORE_COLLECTION = "stations";
+      const ADMIN_UID = "mcdO12xG8rTqUivZdZ3i7kxZ3q63";
       const firebaseConfig = window.TAMIL_RADIO_FIREBASE_CONFIG || {
         apiKey: "AIzaSyDJljslDtyvUKvDNDQN3Nqd4ricJscIFSk",
         authDomain: "ungothpa.firebaseapp.com",
@@ -988,13 +1070,18 @@
       const imgUrlGrp = document.getElementById("imgUrlGroup");
       const modalTitle = document.getElementById("modalTitle");
       const modalSubtitle = document.getElementById("modalSubtitle");
+      const btnOpenModal = document.getElementById("openModal");
       const btnSaveStation = document.getElementById("btnSaveStation");
       const authStatus = document.getElementById("authStatus");
       const btnSignIn = document.getElementById("btnSignIn");
+      const btnProfile = document.getElementById("btnProfile");
+      const profilePopup = document.getElementById("profilePopup");
+      const profileUid = document.getElementById("profileUid");
       const btnSignOut = document.getElementById("btnSignOut");
       const defaultFormErrorMessage =
         "Please fill in the Station Name and Stream URL.";
       let imgMode = "default";
+      let toastTimerSeed = 1;
 
       function nextLocalId() {
         const id = `local-${localIdSeed}`;
@@ -1010,6 +1097,26 @@
           url: (raw.url || "").trim(),
           img: (raw.img || "").trim() || null,
         };
+      }
+
+      function showToast(message, type = "error", ttl = 3200) {
+        let container = document.getElementById("toastContainer");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "toastContainer";
+          container.className = "toast-container";
+          document.body.appendChild(container);
+        }
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        const id = toastTimerSeed++;
+        toast.dataset.id = String(id);
+        container.appendChild(toast);
+        setTimeout(() => {
+          const el = container.querySelector(`.toast[data-id="${id}"]`);
+          if (el) el.remove();
+        }, ttl);
       }
 
       function makePlaceholder() {
@@ -1036,8 +1143,17 @@
         card.style.animationDelay = `${index * 70}ms`;
 
         const imgSection = station.img
-          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}`
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
           : makePlaceholder();
+        const actionsSection = isAdminUser()
+          ? `<div class="card-actions">
+            <button type="button" class="btn-card-menu" title="More actions">...</button>
+            <div class="card-popup">
+              <button type="button" class="popup-item edit">Edit Station</button>
+              <button type="button" class="popup-item del">Delete Station</button>
+            </div>
+          </div>`
+          : "";
 
         card.innerHTML = `
       <div class="card-img-wrap">
@@ -1057,13 +1173,7 @@
             <div class="bar"></div><div class="bar"></div>
             <div class="bar"></div><div class="bar"></div>
           </div>
-          <div class="card-actions">
-            <button type="button" class="btn-card-menu" title="More actions">...</button>
-            <div class="card-popup">
-              <button type="button" class="popup-item edit">Edit Station</button>
-              <button type="button" class="popup-item del">Delete Station</button>
-            </div>
-          </div>
+          ${actionsSection}
         </div>
       </div>`;
 
@@ -1073,44 +1183,54 @@
         const iconPause = card.querySelector(".icon-pause");
         const menuBtn = card.querySelector(".btn-card-menu");
         const popup = card.querySelector(".card-popup");
-
-        menuBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          document.querySelectorAll(".card-popup.open").forEach((el) => {
-            if (el !== popup) {
-              el.classList.remove("open");
-              el.closest(".card")?.classList.remove("has-menu-open");
-            }
-          });
-          popup.classList.toggle("open");
-          card.classList.toggle("has-menu-open", popup.classList.contains("open"));
-        });
-
-        card.querySelector(".popup-item.edit").addEventListener("click", () => {
-          popup.classList.remove("open");
-          card.classList.remove("has-menu-open");
-          openModalForEdit(station.id);
-        });
-
-        card.querySelector(".popup-item.del").addEventListener("click", async () => {
-          popup.classList.remove("open");
-          card.classList.remove("has-menu-open");
-          const ok = confirm(`Delete "${station.name}"?`);
-          if (!ok) return;
-
-          try {
-            stations = stations.filter((s) => s.id !== station.id);
-            stopCurrentAudio();
-            renderAll();
-            deleteStation(station.id).catch((err) => {
-              console.error("Cloud delete failed:", err);
-              cloudEnabled = false;
+        if (menuBtn && popup) {
+          menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            document.querySelectorAll(".card-popup.open").forEach((el) => {
+              if (el !== popup) {
+                el.classList.remove("open");
+                el.closest(".card")?.classList.remove("has-menu-open");
+              }
             });
-          } catch (err) {
-            console.error(err);
-            cloudEnabled = false;
-          }
-        });
+            popup.classList.toggle("open");
+            card.classList.toggle(
+              "has-menu-open",
+              popup.classList.contains("open"),
+            );
+          });
+
+          card
+            .querySelector(".popup-item.edit")
+            .addEventListener("click", () => {
+              popup.classList.remove("open");
+              card.classList.remove("has-menu-open");
+              openModalForEdit(station.id);
+            });
+
+          card
+            .querySelector(".popup-item.del")
+            .addEventListener("click", async () => {
+              popup.classList.remove("open");
+              card.classList.remove("has-menu-open");
+              const ok = confirm(`Delete "${station.name}"?`);
+              if (!ok) return;
+
+              try {
+                stations = stations.filter((s) => s.id !== station.id);
+                stopCurrentAudio();
+                renderAll();
+                deleteStation(station.id).catch((err) => {
+                  console.error("Cloud delete failed:", err);
+                  showToast("Cloud delete failed.");
+                  cloudEnabled = false;
+                });
+              } catch (err) {
+                console.error(err);
+                showToast("Delete failed.");
+                cloudEnabled = false;
+              }
+            });
+        }
 
         btn.addEventListener("click", () => {
           const isPlaying = card.classList.contains("playing");
@@ -1171,12 +1291,14 @@
       }
 
       function openModalForAdd() {
+        if (!isAdminUser()) return;
         editingStationId = null;
         setModalMode(false);
         overlay.classList.add("open");
       }
 
       function openModalForEdit(stationId) {
+        if (!isAdminUser()) return;
         const station = stations.find((s) => s.id === stationId);
         if (!station) return;
 
@@ -1231,16 +1353,31 @@
         return true;
       }
 
+      function isAdminUser() {
+        return Boolean(currentUser && currentUser.uid === ADMIN_UID);
+      }
+
       function updateAuthUi() {
-        if (currentUser) {
-          authStatus.textContent = `Signed in: ${currentUser.uid.slice(0, 8)}...`;
-          btnSignIn.classList.add("hidden");
-          btnSignOut.classList.remove("hidden");
+        profilePopup.classList.add("hidden");
+
+        if (!currentUser) {
+          authStatus.textContent = "Not signed in";
+          btnSignIn.classList.remove("hidden");
+          btnProfile.classList.add("hidden");
           return;
         }
-        authStatus.textContent = "Not signed in";
+
+        if (isAdminUser()) {
+          authStatus.textContent = "Authorized";
+          profileUid.textContent = `UID: ${currentUser.uid}`;
+          btnSignIn.classList.add("hidden");
+          btnProfile.classList.remove("hidden");
+          return;
+        }
+
+        authStatus.textContent = "Failed";
         btnSignIn.classList.remove("hidden");
-        btnSignOut.classList.add("hidden");
+        btnProfile.classList.add("hidden");
       }
 
       function initAuth() {
@@ -1262,6 +1399,7 @@
           .catch((err) => {
             console.error("Redirect result failed:", err);
             authStatus.textContent = `Login failed (${err.code || "redirect-result-error"})`;
+            showToast(`Login failed (${err.code || "redirect-result-error"})`);
           });
       }
 
@@ -1278,6 +1416,7 @@
           );
         } catch (err) {
           console.error(err);
+          showToast("Failed to read default station data.");
           return [];
         }
       }
@@ -1306,7 +1445,7 @@
       }
 
       async function createStation(station) {
-        if (!cloudEnabled || !currentUser)
+        if (!cloudEnabled || !isAdminUser())
           return normalizeStation(station, nextLocalId());
         try {
           const ref = await stationsRef.add({
@@ -1321,13 +1460,14 @@
           return normalizeStation(station, ref.id);
         } catch (err) {
           console.error(err);
+          showToast("Cloud create failed. Switched to local mode.");
           cloudEnabled = false;
           return normalizeStation(station, nextLocalId());
         }
       }
 
       async function updateStation(station) {
-        if (!cloudEnabled || !currentUser) return;
+        if (!cloudEnabled || !isAdminUser()) return;
         await stationsRef.doc(station.id).update({
           name: station.name,
           freq: station.freq,
@@ -1339,7 +1479,7 @@
       }
 
       async function deleteStation(stationId) {
-        if (!cloudEnabled || !currentUser) return;
+        if (!cloudEnabled || !isAdminUser()) return;
         await stationsRef.doc(stationId).delete();
       }
 
@@ -1365,14 +1505,16 @@
           renderAll();
         } catch (err) {
           console.error("Cloud sync failed:", err);
+          showToast("Cloud sync failed. Using local station data.");
           cloudEnabled = false;
           // Keep using localDefaults (already rendered)
         }
       }
 
-      document
-        .getElementById("openModal")
-        .addEventListener("click", openModalForAdd);
+      btnOpenModal.addEventListener("click", () => {
+        profilePopup.classList.add("hidden");
+        openModalForAdd();
+      });
       document
         .getElementById("closeModal")
         .addEventListener("click", closeModal);
@@ -1408,6 +1550,13 @@
         }
         formError.classList.remove("visible");
 
+        if (!isAdminUser()) {
+          formError.textContent = "Failed: unauthorized user.";
+          formError.classList.add("visible");
+          showToast("Failed: unauthorized user.");
+          return;
+        }
+
         btnSaveStation.disabled = true;
         try {
           if (editingStationId) {
@@ -1420,6 +1569,7 @@
             closeModal();
             updateStation(updated).catch((err) => {
               console.error("Cloud update failed:", err);
+              showToast("Cloud update failed.");
               cloudEnabled = false;
             });
           } else {
@@ -1439,6 +1589,7 @@
               })
               .catch((err) => {
                 console.error("Cloud create failed:", err);
+                showToast("Cloud create failed.");
                 cloudEnabled = false;
               });
           }
@@ -1446,6 +1597,7 @@
           console.error("Save failed:", err);
           formError.textContent = "Unable to save station.";
           formError.classList.add("visible");
+          showToast("Unable to save station.");
           cloudEnabled = false;
         } finally {
           btnSaveStation.disabled = false;
@@ -1458,12 +1610,13 @@
 
       document.addEventListener("click", (e) => {
         if (!e.target.closest(".card-actions")) {
-          document
-            .querySelectorAll(".card-popup.open")
-            .forEach((el) => {
-              el.classList.remove("open");
-              el.closest(".card")?.classList.remove("has-menu-open");
-            });
+          document.querySelectorAll(".card-popup.open").forEach((el) => {
+            el.classList.remove("open");
+            el.closest(".card")?.classList.remove("has-menu-open");
+          });
+        }
+        if (!e.target.closest(".profile-wrap")) {
+          profilePopup.classList.add("hidden");
         }
       });
 
@@ -1471,6 +1624,9 @@
         try {
           initAuth();
           if (!authReady) throw new Error("Auth is not configured.");
+          if (currentUser && !isAdminUser()) {
+            await firebase.auth().signOut();
+          }
           const provider = new firebase.auth.GoogleAuthProvider();
           await firebase.auth().signInWithPopup(provider);
         } catch (err) {
@@ -1490,11 +1646,19 @@
             } catch (redirectErr) {
               console.error("Redirect sign in failed:", redirectErr);
               authStatus.textContent = `Login failed (${redirectErr.code || "redirect-error"})`;
+              showToast(`Login failed (${redirectErr.code || "redirect-error"})`);
               return;
             }
           }
           authStatus.textContent = `Login failed (${code})`;
+          showToast(`Login failed (${code})`);
         }
+      });
+
+      btnProfile.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!isAdminUser()) return;
+        profilePopup.classList.toggle("hidden");
       });
 
       btnSignOut.addEventListener("click", async () => {
@@ -1505,6 +1669,7 @@
           updateAuthUi();
         } catch (err) {
           console.error("Sign out failed:", err);
+          showToast("Sign out failed.");
         }
       });
 
