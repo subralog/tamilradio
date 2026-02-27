@@ -1,0 +1,34 @@
+{
+  "stations": [
+    {
+      "name": "Big FM",
+      "freq": "92.7 FM",
+      "url": "https://radios.crabdance.com:8002/4",
+      "img": "https://pub-bf231b2642184d07af20d778fa6e535f.r2.dev/images/bigfm.png"
+    },
+    {
+      "name": "Suriyan FM",
+      "freq": "93.5 FM",
+      "url": "http://radios.crabdance.com:8002/2",
+      "img": "https://pub-bf231b2642184d07af20d778fa6e535f.r2.dev/images/suryanfm.png"
+    },
+    {
+      "name": "Radio Mirchi",
+      "freq": "98.3 FM",
+      "url": "https://radios.crabdance.com:8002/1",
+      "img": "https://pub-bf231b2642184d07af20d778fa6e535f.r2.dev/images/mirchi.png"
+    },
+    {
+      "name": "Radio City",
+      "freq": "91.1 FM",
+      "url": "https://radios.crabdance.com:8002/5",
+      "img": "https://pub-bf231b2642184d07af20d778fa6e535f.r2.dev/images/RADIOCITY.NS.png"
+    },
+    {
+      "name": "Hello FM",
+      "freq": "106.4 FM",
+      "url": "https://radios.crabdance.com:8002/3",
+      "img": "https://pub-bf231b2642184d07af20d778fa6e535f.r2.dev/images/Hellofm-1-1.png"
+    }
+  ]
+}
