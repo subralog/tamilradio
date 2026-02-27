@@ -1143,7 +1143,7 @@
         card.style.animationDelay = `${index * 70}ms`;
 
         const imgSection = station.img
-          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}`
           : makePlaceholder();
         const actionsSection = isAdminUser()
           ? `<div class="card-actions">
@@ -1646,7 +1646,9 @@
             } catch (redirectErr) {
               console.error("Redirect sign in failed:", redirectErr);
               authStatus.textContent = `Login failed (${redirectErr.code || "redirect-error"})`;
-              showToast(`Login failed (${redirectErr.code || "redirect-error"})`);
+              showToast(
+                `Login failed (${redirectErr.code || "redirect-error"})`,
+              );
               return;
             }
           }
