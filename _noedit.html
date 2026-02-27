@@ -681,176 +681,6 @@
         letter-spacing: 0.08em;
         opacity: 0.45;
       }
-
-      /* ── CARD ACTION BUTTONS (edit / delete) ── */
-      .card-actions {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        display: flex;
-        gap: 6px;
-        opacity: 0;
-        transition: opacity 0.2s;
-        z-index: 10;
-      }
-
-      .card:hover .card-actions {
-        opacity: 1;
-      }
-
-      .btn-card-action {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(20, 16, 32, 0.82);
-        backdrop-filter: blur(6px);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition:
-          background 0.18s,
-          border-color 0.18s,
-          transform 0.15s;
-        flex-shrink: 0;
-      }
-
-      .btn-card-action svg {
-        width: 13px;
-        height: 13px;
-        fill: var(--muted);
-        transition: fill 0.18s;
-      }
-
-      .btn-card-action.edit:hover {
-        background: rgba(201, 169, 110, 0.2);
-        border-color: var(--accent);
-        transform: scale(1.1);
-      }
-      .btn-card-action.edit:hover svg {
-        fill: var(--accent);
-      }
-
-      .btn-card-action.del:hover {
-        background: rgba(180, 80, 80, 0.25);
-        border-color: #c97070;
-        transform: scale(1.1);
-      }
-      .btn-card-action.del:hover svg {
-        fill: #e08080;
-      }
-
-      /* ── DELETE CONFIRM MODAL ── */
-      .confirm-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(10, 8, 18, 0.78);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        z-index: 110;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.22s;
-      }
-      .confirm-overlay.open {
-        opacity: 1;
-        pointer-events: all;
-      }
-      .confirm-box {
-        background: #231e32;
-        border: 1px solid var(--border-light);
-        border-radius: 18px;
-        width: 100%;
-        max-width: 340px;
-        padding: 28px 28px 24px;
-        transform: translateY(20px) scale(0.97);
-        transition: transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1);
-        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.55);
-        text-align: center;
-      }
-      .confirm-overlay.open .confirm-box {
-        transform: translateY(0) scale(1);
-      }
-      .confirm-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background: rgba(180, 80, 80, 0.15);
-        border: 1px solid rgba(180, 80, 80, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 16px;
-      }
-      .confirm-icon svg {
-        width: 20px;
-        height: 20px;
-        fill: #e08080;
-      }
-      .confirm-title {
-        font-family: "Cormorant Garamond", serif;
-        font-size: 1.35rem;
-        font-weight: 700;
-        color: var(--text);
-        margin-bottom: 8px;
-      }
-      .confirm-body {
-        font-size: 13px;
-        color: var(--muted);
-        font-weight: 300;
-        line-height: 1.5;
-        margin-bottom: 24px;
-      }
-      .confirm-body strong {
-        color: var(--text);
-        font-weight: 500;
-      }
-      .confirm-btns {
-        display: flex;
-        gap: 10px;
-      }
-      .btn-cancel-confirm {
-        flex: 1;
-        padding: 11px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        color: var(--muted);
-        font-family: "DM Sans", sans-serif;
-        font-size: 13px;
-        cursor: pointer;
-        transition:
-          background 0.18s,
-          color 0.18s;
-      }
-      .btn-cancel-confirm:hover {
-        background: rgba(255, 255, 255, 0.08);
-        color: var(--text);
-      }
-      .btn-confirm-delete {
-        flex: 1;
-        padding: 11px;
-        background: rgba(180, 80, 80, 0.15);
-        border: 1px solid rgba(180, 80, 80, 0.35);
-        border-radius: 10px;
-        color: #e08080;
-        font-family: "DM Sans", sans-serif;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        transition:
-          background 0.18s,
-          border-color 0.18s;
-      }
-      .btn-confirm-delete:hover {
-        background: rgba(180, 80, 80, 0.28);
-        border-color: #c97070;
-      }
     </style>
   </head>
   <body>
@@ -885,84 +715,7 @@
 
     <footer>All streams are live &nbsp;·&nbsp; Neelankarai, Chennai</footer>
 
-    <!-- EDIT MODAL -->
-    <div class="modal-overlay" id="editModalOverlay">
-      <div class="modal">
-        <div class="modal-header">
-          <div>
-            <div class="modal-title">Edit Station</div>
-            <div class="modal-subtitle">Update the station details</div>
-          </div>
-          <button class="btn-close" id="closeEditModal">✕</button>
-        </div>
-
-        <div class="form-group">
-          <label>Station Name *</label>
-          <input type="text" id="editName" placeholder="e.g. Sun FM" />
-        </div>
-
-        <div class="form-group">
-          <label
-            >Frequency / Tag
-            <span style="opacity: 0.45">(optional)</span></label
-          >
-          <input type="text" id="editFreq" placeholder="e.g. 101.9 FM" />
-        </div>
-
-        <div class="form-group">
-          <label>Stream URL *</label>
-          <input
-            type="url"
-            id="editUrl"
-            placeholder="https://stream.example.com/live"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Image URL <span style="opacity: 0.45">(optional)</span></label>
-          <input
-            type="url"
-            id="editImg"
-            placeholder="https://example.com/logo.jpg"
-          />
-          <div class="form-hint">Leave blank to use the placeholder</div>
-        </div>
-
-        <div class="form-error" id="editFormError">
-          Please fill in the Station Name and Stream URL.
-        </div>
-
-        <button class="btn-submit" id="btnSaveEdit">Save Changes</button>
-      </div>
-    </div>
-
-    <!-- DELETE CONFIRM -->
-    <div class="confirm-overlay" id="confirmOverlay">
-      <div class="confirm-box">
-        <div class="confirm-icon">
-          <svg viewBox="0 0 24 24">
-            <path
-              d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-            />
-          </svg>
-        </div>
-        <div class="confirm-title">Delete Station</div>
-        <div class="confirm-body">
-          Remove <strong id="confirmStationName"></strong> from your collection?
-          This cannot be undone.
-        </div>
-        <div class="confirm-btns">
-          <button class="btn-cancel-confirm" id="btnCancelDelete">
-            Cancel
-          </button>
-          <button class="btn-confirm-delete" id="btnConfirmDelete">
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ADD MODAL -->
+    <!-- MODAL -->
     <div class="modal-overlay" id="modalOverlay">
       <div class="modal">
         <div class="modal-header">
@@ -1028,12 +781,6 @@
     </div>
 
     <script>
-      /* ── JSONBIN.IO CONFIG ── */
-      const JSONBIN_API_KEY =
-        "$2a$10$Ilb3KES0S7mo2F34i5F3z.0TU/eR8fHcQb3Otui31bcAdzuStjqLm";
-      const JSONBIN_BASE = "https://api.jsonbin.io/v3";
-      const BIN_ID_KEY = "tamil_radio_bin_id";
-
       const defaultStations = [
         {
           name: "Big FM",
@@ -1067,135 +814,11 @@
         },
       ];
 
-      let stations = [];
+      let stations = [...defaultStations];
       let currentAudio = null;
       let currentCard = null;
 
       const grid = document.getElementById("radioGrid");
-
-      /* ── SYNC STATUS BADGE ── */
-      function showSyncStatus(msg, isError = false) {
-        let badge = document.getElementById("syncBadge");
-        if (!badge) {
-          badge = document.createElement("div");
-          badge.id = "syncBadge";
-          badge.style.cssText = `
-            position:fixed; bottom:24px; right:24px; z-index:200;
-            padding:9px 16px; border-radius:100px; font-size:12px;
-            font-family:'DM Sans',sans-serif; font-weight:400;
-            display:flex; align-items:center; gap:8px;
-            transition: opacity 0.4s, transform 0.4s;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-          `;
-          document.body.appendChild(badge);
-        }
-        badge.style.background = isError
-          ? "rgba(180,80,80,0.92)"
-          : "rgba(35,30,50,0.95)";
-        badge.style.border = isError
-          ? "1px solid #c97070"
-          : "1px solid #3d3358";
-        badge.style.color = isError ? "#f5c6c6" : "#c9a96e";
-        badge.style.opacity = "1";
-        badge.style.transform = "translateY(0)";
-        badge.innerHTML = msg;
-        clearTimeout(badge._timer);
-        badge._timer = setTimeout(() => {
-          badge.style.opacity = "0";
-          badge.style.transform = "translateY(8px)";
-        }, 2800);
-      }
-
-      /* ── JSONBIN HELPERS ── */
-      async function createBin(data) {
-        const res = await fetch(`${JSONBIN_BASE}/b`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": JSONBIN_API_KEY,
-            "X-Bin-Name": "Tamil Radio Stations",
-            "X-Bin-Private": "true",
-          },
-          body: JSON.stringify({ stations: data }),
-        });
-        if (!res.ok) throw new Error(`Create bin failed: ${res.status}`);
-        const json = await res.json();
-        return json.metadata.id;
-      }
-
-      async function readBin(binId) {
-        const res = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
-          headers: { "X-Master-Key": JSONBIN_API_KEY },
-        });
-        if (!res.ok) throw new Error(`Read bin failed: ${res.status}`);
-        const json = await res.json();
-        return json.record.stations || [];
-      }
-
-      async function writeBin(binId, data) {
-        const res = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": JSONBIN_API_KEY,
-          },
-          body: JSON.stringify({ stations: data }),
-        });
-        if (!res.ok) throw new Error(`Write bin failed: ${res.status}`);
-      }
-
-      /* ── INIT: load from JSONBin or create new bin ── */
-      async function initStations() {
-        showSyncStatus(
-          `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="animation:spin 1s linear infinite"><path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg> Loading stations…`,
-        );
-
-        // Add spinner keyframe once
-        if (!document.getElementById("spinStyle")) {
-          const s = document.createElement("style");
-          s.id = "spinStyle";
-          s.textContent =
-            "@keyframes spin { to { transform: rotate(360deg); } }";
-          document.head.appendChild(s);
-        }
-
-        let binId = localStorage.getItem(BIN_ID_KEY);
-
-        try {
-          if (binId) {
-            stations = await readBin(binId);
-            showSyncStatus(`✦ Stations loaded from cloud`);
-          } else {
-            // First time — create a new bin with default stations
-            binId = await createBin(defaultStations);
-            localStorage.setItem(BIN_ID_KEY, binId);
-            stations = [...defaultStations];
-            showSyncStatus(`✦ Cloud bin created & stations saved`);
-          }
-        } catch (err) {
-          console.error(err);
-          stations = [...defaultStations];
-          showSyncStatus(`⚠ Cloud unavailable — using defaults`, true);
-        }
-
-        renderAll();
-      }
-
-      /* ── SAVE stations back to JSONBin ── */
-      async function saveStations() {
-        const binId = localStorage.getItem(BIN_ID_KEY);
-        if (!binId) return;
-        showSyncStatus(
-          `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="animation:spin 1s linear infinite"><path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg> Saving…`,
-        );
-        try {
-          await writeBin(binId, stations);
-          showSyncStatus(`✦ Saved to cloud`);
-        } catch (err) {
-          console.error(err);
-          showSyncStatus(`⚠ Save failed — check network`, true);
-        }
-      }
 
       function makePlaceholder() {
         return `<div class="card-placeholder">
@@ -1212,21 +835,13 @@
         card.style.animationDelay = `${index * 70}ms`;
 
         const imgSection = station.img
-          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}`
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
           : makePlaceholder();
 
         card.innerHTML = `
       <div class="card-img-wrap">
         ${imgSection}
         <div class="card-overlay"></div>
-        <div class="card-actions">
-          <button class="btn-card-action edit" title="Edit station">
-            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-          </button>
-          <button class="btn-card-action del" title="Delete station">
-            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-          </button>
-        </div>
       </div>
       <div class="card-body">
         <div class="station-name">${station.name}</div>
@@ -1248,22 +863,6 @@
         const statusText = card.querySelector(".status-text");
         const iconPlay = card.querySelector(".icon-play");
         const iconPause = card.querySelector(".icon-pause");
-
-        // Edit button
-        card
-          .querySelector(".btn-card-action.edit")
-          .addEventListener("click", (e) => {
-            e.stopPropagation();
-            openEditModal(index);
-          });
-
-        // Delete button
-        card
-          .querySelector(".btn-card-action.del")
-          .addEventListener("click", (e) => {
-            e.stopPropagation();
-            openDeleteConfirm(index);
-          });
 
         btn.addEventListener("click", () => {
           const isPlaying = card.classList.contains("playing");
@@ -1320,6 +919,8 @@
         stations.forEach((s, i) => grid.appendChild(buildCard(s, i)));
       }
 
+      renderAll();
+
       /* ── MODAL LOGIC ── */
       const overlay = document.getElementById("modalOverlay");
       const formError = document.getElementById("formError");
@@ -1366,7 +967,6 @@
         stations.push({ name, freq, url, img });
         renderAll();
         closeModal();
-        saveStations();
       });
 
       function closeModal() {
@@ -1385,112 +985,8 @@
       }
 
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          closeModal();
-          closeEditModal();
-          closeDeleteConfirm();
-        }
+        if (e.key === "Escape") closeModal();
       });
-
-      /* ── EDIT MODAL ── */
-      const editOverlay = document.getElementById("editModalOverlay");
-      const editFormError = document.getElementById("editFormError");
-      let editingIndex = -1;
-
-      function openEditModal(idx) {
-        editingIndex = idx;
-        const s = stations[idx];
-        document.getElementById("editName").value = s.name || "";
-        document.getElementById("editFreq").value = s.freq || "";
-        document.getElementById("editUrl").value = s.url || "";
-        document.getElementById("editImg").value = s.img || "";
-        editFormError.classList.remove("visible");
-        editOverlay.classList.add("open");
-      }
-
-      function closeEditModal() {
-        editOverlay.classList.remove("open");
-        editingIndex = -1;
-      }
-
-      document
-        .getElementById("closeEditModal")
-        .addEventListener("click", closeEditModal);
-      editOverlay.addEventListener("click", (e) => {
-        if (e.target === editOverlay) closeEditModal();
-      });
-
-      document.getElementById("btnSaveEdit").addEventListener("click", () => {
-        const name = document.getElementById("editName").value.trim();
-        const url = document.getElementById("editUrl").value.trim();
-        if (!name || !url) {
-          editFormError.classList.add("visible");
-          return;
-        }
-        editFormError.classList.remove("visible");
-
-        const freq = document.getElementById("editFreq").value.trim();
-        const img = document.getElementById("editImg").value.trim() || null;
-
-        // Stop audio if this card is playing
-        if (currentCard) {
-          const playingIdx = [...grid.children].indexOf(currentCard);
-          if (playingIdx === editingIndex) {
-            currentAudio && currentAudio.pause();
-            currentAudio = null;
-            currentCard = null;
-          }
-        }
-
-        stations[editingIndex] = { name, freq, url, img };
-        renderAll();
-        closeEditModal();
-        saveStations();
-      });
-
-      /* ── DELETE CONFIRM ── */
-      const confirmOverlay = document.getElementById("confirmOverlay");
-      let deletingIndex = -1;
-
-      function openDeleteConfirm(idx) {
-        deletingIndex = idx;
-        document.getElementById("confirmStationName").textContent =
-          stations[idx].name;
-        confirmOverlay.classList.add("open");
-      }
-
-      function closeDeleteConfirm() {
-        confirmOverlay.classList.remove("open");
-        deletingIndex = -1;
-      }
-
-      document
-        .getElementById("btnCancelDelete")
-        .addEventListener("click", closeDeleteConfirm);
-      confirmOverlay.addEventListener("click", (e) => {
-        if (e.target === confirmOverlay) closeDeleteConfirm();
-      });
-
-      document
-        .getElementById("btnConfirmDelete")
-        .addEventListener("click", () => {
-          if (deletingIndex === -1) return;
-
-          // Stop audio if the deleted station is playing
-          if (currentCard) {
-            const playingIdx = [...grid.children].indexOf(currentCard);
-            if (playingIdx === deletingIndex) {
-              currentAudio && currentAudio.pause();
-              currentAudio = null;
-              currentCard = null;
-            }
-          }
-
-          stations.splice(deletingIndex, 1);
-          renderAll();
-          closeDeleteConfirm();
-          saveStations();
-        });
 
       /* ── VOLUME KNOB ── */
       const knobWrap = document.getElementById("knobWrap");
@@ -1577,9 +1073,6 @@
 
       // Init
       setVolume(0.8);
-
-      // Load stations from JSONBin
-      initStations();
     </script>
   </body>
 </html>
