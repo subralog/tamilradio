@@ -1689,7 +1689,7 @@
       const knobFill = document.getElementById("knobFill");
       const volPct = document.getElementById("volPct");
 
-      let volume = 0.8;
+      let volume = 0.3;
       let isDragging = false;
       let dragStartY = 0;
       let dragStartVol = 0;
@@ -1699,12 +1699,12 @@
         if (currentAudio) currentAudio.volume = volume;
 
         const pct = Math.round(volume * 100);
-        const angleDeg = -135 + volume * 270;
+        const angleDeg = -140 + volume * 270;
         knobIndicator.style.transform = `rotate(${angleDeg}deg)`;
         volPct.textContent = pct + "%";
 
         const startDeg = 30;
-        const fillEnd = startDeg + volume * 270;
+        const fillEnd = startDeg + volume * 300;
         knobFill.style.background = `conic-gradient(
       transparent 0deg,
       transparent ${startDeg}deg,
