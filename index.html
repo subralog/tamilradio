@@ -746,21 +746,91 @@
         transform: translateY(-1px);
       }
 
+      .player-dock {
+        position: fixed;
+        right: 20px;
+        top: 88px;
+        width: 178px;
+        padding: 14px 12px;
+        border-radius: 16px;
+        background: rgba(28, 24, 40, 0.48);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        z-index: 120;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .player-actions {
+        width: 100%;
+      }
+
+      .dock-btn {
+        width: 100%;
+        border: 1px solid var(--border-light);
+        background: rgba(201, 169, 110, 0.12);
+        color: var(--accent2);
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        letter-spacing: 0.04em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .dock-btn:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      .dock-status {
+        font-size: 12px;
+        color: var(--muted);
+        text-align: center;
+        line-height: 1.4;
+      }
+
+      .dock-btn svg {
+        width: 14px;
+        height: 14px;
+        fill: currentColor;
+      }
+
+      .dock-btn .icon-pause {
+        display: none;
+      }
+
+      .dock-btn.is-playing .icon-play {
+        display: none;
+      }
+
+      .dock-btn.is-playing .icon-pause {
+        display: inline;
+      }
+
       /* ── VOLUME KNOB ── */
       .volume-center {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 8px;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: 48px;
+        position: static;
+        left: auto;
+        transform: none;
+        top: auto;
         user-select: none;
       }
 
       .vol-label {
-        font-size: 9px;
+        font-size: 12px;
         letter-spacing: 0.22em;
         text-transform: uppercase;
         color: var(--muted);
@@ -831,7 +901,7 @@
       }
 
       .vol-pct {
-        font-size: 11px;
+        font-size: 13px;
         color: var(--accent);
         font-weight: 400;
         letter-spacing: 0.04em;
@@ -952,6 +1022,15 @@
         border-color: rgba(201, 80, 80, 0.45);
         color: #f1b8b8;
       }
+
+      @media (max-width: 900px) {
+        .player-dock {
+          right: 12px;
+          top: auto;
+          bottom: 12px;
+          width: 160px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -985,7 +1064,20 @@
         </div>
       </div>
 
-      <!-- Volume Knob -->
+    </div>
+
+    <div class="player-dock">
+      <div class="player-actions">
+        <button type="button" class="dock-btn" id="dockToggle" title="Play">
+          <svg class="icon-play" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+          <svg class="icon-pause" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+          </svg>
+          <span id="dockToggleText">Play</span>
+        </button>
+      </div>
       <div class="volume-center">
         <div class="vol-label">Volume</div>
         <div class="knob-wrap" id="knobWrap">
@@ -997,6 +1089,7 @@
         </div>
         <div class="vol-pct" id="volPct">80%</div>
       </div>
+      <div class="dock-status" id="dockStatus">No station selected</div>
     </div>
 
     <div class="grid" id="radioGrid"></div>
@@ -1162,6 +1255,7 @@
       let stations = [];
       let currentAudio = null;
       let currentCard = null;
+      let lastPlayedStationId = null;
       let editingStationId = null;
       let currentUser = null;
       let localIdSeed = 1;
@@ -1184,6 +1278,9 @@
       const profilePopup = document.getElementById("profilePopup");
       const profileUid = document.getElementById("profileUid");
       const btnSignOut = document.getElementById("btnSignOut");
+      const dockToggle = document.getElementById("dockToggle");
+      const dockToggleText = document.getElementById("dockToggleText");
+      const dockStatus = document.getElementById("dockStatus");
       const defaultFormErrorMessage =
         "Please fill in the Station Name and Stream URL.";
       let imgMode = "default";
@@ -1241,15 +1338,52 @@
         }
         if (currentCard) resetCard(currentCard);
         currentCard = null;
+        updateDockState();
+      }
+
+      function updateDockState() {
+        const hasHistory = Boolean(lastPlayedStationId);
+        const isPlaying = Boolean(currentAudio);
+        dockToggle.disabled = !isPlaying && !hasHistory;
+        dockToggle.classList.toggle("is-playing", isPlaying);
+        dockToggleText.textContent = isPlaying ? "Pause" : "Play";
+        dockToggle.title = isPlaying ? "Pause" : "Play";
+
+        if (isPlaying) {
+          const station = stations.find((s) => s.id === lastPlayedStationId);
+          dockStatus.textContent = station
+            ? `Now Playing: ${station.name}`
+            : "Now Playing";
+        } else if (hasHistory) {
+          const station = stations.find((s) => s.id === lastPlayedStationId);
+          dockStatus.textContent = station
+            ? `Ready: ${station.name}`
+            : "Ready to play";
+        } else {
+          dockStatus.textContent = "No station selected";
+        }
+      }
+
+      function togglePlaybackFromDock() {
+        if (currentAudio && currentCard) {
+          currentCard.querySelector(".btn-play")?.click();
+          return;
+        }
+        if (!lastPlayedStationId) return;
+        const targetCard = grid.querySelector(
+          `.card[data-station-id="${lastPlayedStationId}"]`,
+        );
+        targetCard?.querySelector(".btn-play")?.click();
       }
 
       function buildCard(station, index) {
         const card = document.createElement("div");
         card.className = "card";
+        card.dataset.stationId = station.id;
         card.style.animationDelay = `${index * 70}ms`;
 
         const imgSection = station.img
-          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}`
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
           : makePlaceholder();
         const actionsSection = isAdminUser()
           ? `<div class="card-actions">
@@ -1347,9 +1481,11 @@
             audio.volume = volume;
             audio.play().catch(() => {
               statusText.textContent = "Unavailable";
+              updateDockState();
             });
             currentAudio = audio;
             currentCard = card;
+            lastPlayedStationId = station.id;
 
             card.classList.add("playing");
             btn.classList.add("playing");
@@ -1363,8 +1499,10 @@
               statusText.textContent = "Stream error";
               currentAudio = null;
               currentCard = null;
+              updateDockState();
             });
           }
+          updateDockState();
         });
 
         return card;
@@ -1384,6 +1522,7 @@
       function renderAll() {
         grid.innerHTML = "";
         stations.forEach((s, i) => grid.appendChild(buildCard(s, i)));
+        updateDockState();
       }
 
       function setModalMode(isEdit) {
@@ -1713,6 +1852,19 @@
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") closeModal();
 
+        const tag = e.target && e.target.tagName ? e.target.tagName : "";
+        const isTypingContext =
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          (e.target && e.target.isContentEditable);
+        if (isTypingContext) return;
+
+        if (e.code === "Space") {
+          e.preventDefault();
+          togglePlaybackFromDock();
+          return;
+        }
+
         if (!e.altKey) return;
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -1776,6 +1928,10 @@
         e.stopPropagation();
         if (!isAdminUser()) return;
         profilePopup.classList.toggle("hidden");
+      });
+
+      dockToggle.addEventListener("click", () => {
+        togglePlaybackFromDock();
       });
 
       btnSignOut.addEventListener("click", async () => {
@@ -1883,6 +2039,7 @@
       );
 
       setVolume(0.8);
+      updateDockState();
       initAuth();
       updateAuthUi();
       initializeStations();
