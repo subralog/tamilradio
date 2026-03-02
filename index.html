@@ -839,6 +839,72 @@
         text-align: center;
       }
 
+      .volume-flash {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0.72);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 700;
+        transition:
+          transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+          opacity 0.45s ease;
+      }
+
+      .volume-flash-shell {
+        min-width: min(86vw, 520px);
+        padding: clamp(20px, 3.2vw, 30px) clamp(26px, 4vw, 40px);
+        border-radius: clamp(22px, 3vw, 34px);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background:
+          linear-gradient(
+            140deg,
+            rgba(255, 255, 255, 0.22),
+            rgba(255, 255, 255, 0.08)
+          ),
+          rgba(28, 22, 40, 0.42);
+        box-shadow:
+          0 20px 42px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3),
+          inset 0 -20px 36px rgba(80, 56, 124, 0.2);
+        backdrop-filter: blur(16px) saturate(120%);
+        -webkit-backdrop-filter: blur(16px) saturate(120%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(14px, 2vw, 22px);
+      }
+
+      .volume-flash-icon {
+        width: clamp(34px, 5vw, 56px);
+        height: clamp(34px, 5vw, 56px);
+        color: rgba(248, 234, 198, 0.95);
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+        flex: 0 0 auto;
+      }
+
+      .volume-flash-value {
+        font-size: clamp(62px, 16vw, 190px);
+        line-height: 0.9;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: rgba(248, 234, 198, 0.95);
+        text-shadow:
+          0 10px 28px rgba(0, 0, 0, 0.45),
+          0 0 26px rgba(201, 169, 110, 0.3);
+      }
+
+      .volume-flash.visible {
+        transform: translate(-50%, -50%) scale(1.16);
+        opacity: 1;
+      }
+
+      .volume-flash.fade-out {
+        transform: translate(-50%, -50%) scale(1.34);
+        opacity: 0;
+      }
+
       footer {
         text-align: center;
         margin-top: 56px;
@@ -923,6 +989,35 @@
     </div>
 
     <div class="grid" id="radioGrid"></div>
+
+    <div class="volume-flash" id="volumeFlash" aria-hidden="true">
+      <div class="volume-flash-shell">
+        <svg
+          class="volume-flash-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M5 10H8L12.4 6.2C12.7 5.94 13.16 6.14 13.16 6.54V17.46C13.16 17.86 12.7 18.06 12.4 17.8L8 14H5C4.45 14 4 13.55 4 13V11C4 10.45 4.45 10 5 10Z"
+            fill="currentColor"
+          />
+          <path
+            d="M16 9.2C16.9 9.92 17.5 10.98 17.5 12.1C17.5 13.22 16.9 14.28 16 15"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+          <path
+            d="M17.9 7.2C19.25 8.32 20.1 10.13 20.1 12.1C20.1 14.07 19.25 15.88 17.9 17"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+          />
+        </svg>
+        <span class="volume-flash-value" id="volumeFlashValue">80%</span>
+      </div>
+    </div>
 
     <footer>All streams are live &nbsp;·&nbsp; Neelankarai, Chennai</footer>
 
@@ -1688,13 +1783,31 @@
       const knobIndicator = document.getElementById("knobIndicator");
       const knobFill = document.getElementById("knobFill");
       const volPct = document.getElementById("volPct");
+      const volumeFlash = document.getElementById("volumeFlash");
+      const volumeFlashValue = document.getElementById("volumeFlashValue");
 
       let volume = 0.3;
       let isDragging = false;
       let dragStartY = 0;
       let dragStartVol = 0;
+      let volumeFlashFadeTimeout;
+
+      function showVolumeFlash(pct) {
+        volumeFlashValue.textContent = pct + "%";
+        volumeFlash.classList.remove("fade-out", "visible");
+        clearTimeout(volumeFlashFadeTimeout);
+
+        requestAnimationFrame(() => {
+          volumeFlash.classList.add("visible");
+          volumeFlashFadeTimeout = setTimeout(() => {
+            volumeFlash.classList.remove("visible");
+            volumeFlash.classList.add("fade-out");
+          }, 210);
+        });
+      }
 
       function setVolume(v) {
+        const prevPct = Math.round(volume * 100);
         volume = Math.min(1, Math.max(0, v));
         if (currentAudio) currentAudio.volume = volume;
 
@@ -1712,6 +1825,10 @@
       var(--accent) ${fillEnd}deg,
       transparent ${fillEnd}deg
     )`;
+
+        if (pct !== prevPct) {
+          showVolumeFlash(pct);
+        }
       }
 
       knobWrap.addEventListener("mousedown", (e) => {
