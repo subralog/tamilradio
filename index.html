@@ -750,9 +750,9 @@
         position: fixed;
         right: 20px;
         top: 88px;
-        width: 178px;
-        padding: 14px 12px;
-        border-radius: 16px;
+        width: 252px;
+        padding: 18px 16px;
+        border-radius: 20px;
         background: rgba(28, 24, 40, 0.48);
         border: 1px solid rgba(255, 255, 255, 0.14);
         box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35);
@@ -767,23 +767,27 @@
 
       .player-actions {
         width: 100%;
+        display: flex;
+        gap: 10px;
       }
 
       .dock-btn {
-        width: 100%;
+        flex: 1 1 0;
+        min-width: 0;
         border: 1px solid var(--border-light);
         background: rgba(201, 169, 110, 0.12);
         color: var(--accent2);
         border-radius: 999px;
-        padding: 7px 10px;
-        font-size: 13px;
+        min-height: 52px;
+        padding: 10px 14px;
+        font-size: 15px;
         font-family: "DM Sans", sans-serif;
         letter-spacing: 0.04em;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
       }
 
       .dock-btn:disabled {
@@ -792,15 +796,15 @@
       }
 
       .dock-status {
-        font-size: 12px;
+        font-size: 13px;
         color: var(--muted);
         text-align: center;
         line-height: 1.4;
       }
 
       .dock-btn svg {
-        width: 14px;
-        height: 14px;
+        width: 18px;
+        height: 18px;
         fill: currentColor;
       }
 
@@ -816,12 +820,17 @@
         display: inline;
       }
 
-      /* ── VOLUME KNOB ── */
+      .dock-btn.is-active {
+        background: rgba(201, 169, 110, 0.24);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+      }
+
+      /* ── VOLUME SLIDER ── */
       .volume-center {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
         position: static;
         left: auto;
         transform: none;
@@ -830,83 +839,101 @@
       }
 
       .vol-label {
-        font-size: 12px;
+        font-size: 13px;
         letter-spacing: 0.22em;
         text-transform: uppercase;
         color: var(--muted);
         opacity: 0.7;
       }
 
-      .knob-wrap {
-        position: relative;
-        width: 56px;
-        height: 56px;
-        cursor: grab;
-      }
-
-      .knob-wrap:active {
-        cursor: grabbing;
-      }
-
-      .knob-track {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: conic-gradient(
-          var(--border) 0deg,
-          var(--border) 30deg,
-          transparent 30deg,
-          transparent 330deg,
-          var(--border) 330deg
-        );
-      }
-
-      .knob-fill {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background: conic-gradient(
-          transparent 0deg,
-          transparent 30deg,
-          var(--accent) 30deg,
-          var(--accent) 30deg,
-          transparent 30deg
-        );
-        transition: background 0.05s;
-      }
-
-      .knob-body {
-        position: absolute;
-        inset: 7px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 38% 35%, #2e2840, #1c1828);
-        border: 1px solid var(--border-light);
-        box-shadow:
-          0 2px 12px rgba(0, 0, 0, 0.5),
-          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      .volume-slider-wrap {
+        width: 158px;
         display: flex;
         align-items: center;
-        justify-content: center;
       }
 
-      .knob-indicator {
-        width: 3px;
-        height: 10px;
-        background: var(--accent);
-        border-radius: 2px;
-        transform-origin: center 14px;
-        transform: rotate(-135deg);
-        transition: transform 0.05s;
-        opacity: 0.9;
+      .volume-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          var(--accent) 0%,
+          var(--accent) 50%,
+          rgba(255, 255, 255, 0.12) 50%,
+          rgba(255, 255, 255, 0.12) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+      }
+
+      .volume-slider:focus {
+        outline: none;
+      }
+
+      .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f7e8c6, var(--accent));
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.32),
+          0 0 0 4px rgba(201, 169, 110, 0.12);
+        transform: scale(1);
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      .volume-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #f7e8c6, var(--accent));
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        box-shadow:
+          0 4px 12px rgba(0, 0, 0, 0.32),
+          0 0 0 4px rgba(201, 169, 110, 0.12);
+        transform: scale(1);
+        transition:
+          transform 0.18s ease,
+          box-shadow 0.18s ease;
+      }
+
+      .volume-slider::-moz-range-track {
+        height: 8px;
+        border-radius: 999px;
+        background: transparent;
+        border: none;
       }
 
       .vol-pct {
-        font-size: 13px;
+        font-size: 16px;
         color: var(--accent);
         font-weight: 400;
         letter-spacing: 0.04em;
-        min-width: 34px;
+        min-width: 46px;
         text-align: center;
+      }
+
+      .volume-slider.dragging::-webkit-slider-thumb {
+        transform: scale(1.28);
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.4),
+          0 0 0 6px rgba(201, 169, 110, 0.18);
+      }
+
+      .volume-slider.dragging::-moz-range-thumb {
+        transform: scale(1.28);
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.4),
+          0 0 0 6px rgba(201, 169, 110, 0.18);
       }
 
       .volume-flash {
@@ -1028,7 +1055,48 @@
           right: 12px;
           top: auto;
           bottom: 12px;
-          width: 160px;
+          width: 212px;
+          padding: 14px 12px;
+          gap: 8px;
+        }
+
+        .player-actions {
+          gap: 8px;
+        }
+
+        .dock-btn {
+          min-height: 44px;
+          padding: 8px 10px;
+          font-size: 13px;
+          gap: 6px;
+        }
+
+        .dock-btn svg {
+          width: 15px;
+          height: 15px;
+        }
+
+        .volume-slider-wrap {
+          width: 136px;
+        }
+
+        .volume-slider {
+          height: 7px;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+          width: 16px;
+          height: 16px;
+        }
+
+        .volume-slider::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+        }
+
+        .vol-pct {
+          font-size: 14px;
+          min-width: 40px;
         }
       }
     </style>
@@ -1063,7 +1131,6 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <div class="player-dock">
@@ -1077,17 +1144,48 @@
           </svg>
           <span id="dockToggleText">Play</span>
         </button>
+        <button
+          type="button"
+          class="dock-btn"
+          id="muteToggle"
+          title="Mute (Ctrl+M)"
+        >
+          <svg class="icon-volume" viewBox="0 0 24 24">
+            <path
+              d="M5 10H8L12.4 6.2C12.7 5.94 13.16 6.14 13.16 6.54V17.46C13.16 17.86 12.7 18.06 12.4 17.8L8 14H5C4.45 14 4 13.55 4 13V11C4 10.45 4.45 10 5 10Z"
+            />
+            <path
+              d="M16 9.2C16.9 9.92 17.5 10.98 17.5 12.1C17.5 13.22 16.9 14.28 16 15"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+            <path
+              d="M18.3 6.9C19.9 8.2 20.9 10.08 20.9 12.1C20.9 14.12 19.9 16 18.3 17.3"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <span id="muteToggleText">Mute</span>
+        </button>
       </div>
       <div class="volume-center">
         <div class="vol-label">Volume</div>
-        <div class="knob-wrap" id="knobWrap">
-          <div class="knob-track"></div>
-          <div class="knob-fill" id="knobFill"></div>
-          <div class="knob-body">
-            <div class="knob-indicator" id="knobIndicator"></div>
-          </div>
+        <div class="volume-slider-wrap">
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            class="volume-slider"
+            id="volumeSlider"
+            aria-label="Volume"
+          />
         </div>
-        <div class="vol-pct" id="volPct">80%</div>
+        <div class="vol-pct" id="volPct">50%</div>
       </div>
       <div class="dock-status" id="dockStatus">No station selected</div>
     </div>
@@ -1119,7 +1217,7 @@
             stroke-linecap="round"
           />
         </svg>
-        <span class="volume-flash-value" id="volumeFlashValue">80%</span>
+        <span class="volume-flash-value" id="volumeFlashValue">50%</span>
       </div>
     </div>
 
@@ -1280,6 +1378,8 @@
       const btnSignOut = document.getElementById("btnSignOut");
       const dockToggle = document.getElementById("dockToggle");
       const dockToggleText = document.getElementById("dockToggleText");
+      const muteToggle = document.getElementById("muteToggle");
+      const muteToggleText = document.getElementById("muteToggleText");
       const dockStatus = document.getElementById("dockStatus");
       const defaultFormErrorMessage =
         "Please fill in the Station Name and Stream URL.";
@@ -1364,6 +1464,18 @@
         }
       }
 
+      function updateMuteUi() {
+        muteToggle.classList.toggle("is-active", isMuted);
+        muteToggleText.textContent = isMuted ? "Muted" : "Mute";
+        muteToggle.title = isMuted ? "Unmute (Ctrl+M)" : "Mute (Ctrl+M)";
+      }
+
+      function toggleMute() {
+        isMuted = !isMuted;
+        if (currentAudio) currentAudio.muted = isMuted;
+        updateMuteUi();
+      }
+
       function togglePlaybackFromDock() {
         if (currentAudio && currentCard) {
           currentCard.querySelector(".btn-play")?.click();
@@ -1383,7 +1495,7 @@
         card.style.animationDelay = `${index * 70}ms`;
 
         const imgSection = station.img
-          ? `<img class="station-img" src="${station.img}" alt="${station.name}" onerror="this.outerHTML='${makePlaceholder().replace(/'/g, "&#39;")}'>`
+          ? `<img class="station-img" src="${station.img}" alt="${station.name}">`
           : makePlaceholder();
         const actionsSection = isAdminUser()
           ? `<div class="card-actions">
@@ -1408,7 +1520,7 @@
             <svg class="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             <svg class="icon-pause" viewBox="0 0 24 24" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
           </button>
-          <span class="status-text">Tap to play</span>
+          <span class="status-text"></span>
           <div class="bars">
             <div class="bar"></div><div class="bar"></div>
             <div class="bar"></div><div class="bar"></div>
@@ -1418,11 +1530,21 @@
       </div>`;
 
         const btn = card.querySelector(".btn-play");
+        const stationImg = card.querySelector(".station-img");
         const statusText = card.querySelector(".status-text");
         const iconPlay = card.querySelector(".icon-play");
         const iconPause = card.querySelector(".icon-pause");
         const menuBtn = card.querySelector(".btn-card-menu");
         const popup = card.querySelector(".card-popup");
+        if (stationImg) {
+          stationImg.addEventListener(
+            "error",
+            () => {
+              stationImg.outerHTML = makePlaceholder();
+            },
+            { once: true },
+          );
+        }
         if (menuBtn && popup) {
           menuBtn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -1479,6 +1601,7 @@
           if (!isPlaying) {
             const audio = new Audio(station.url);
             audio.volume = volume;
+            audio.muted = isMuted;
             audio.play().catch(() => {
               statusText.textContent = "Unavailable";
               updateDockState();
@@ -1859,6 +1982,17 @@
           (e.target && e.target.isContentEditable);
         if (isTypingContext) return;
 
+        if (
+          e.ctrlKey &&
+          !e.altKey &&
+          !e.shiftKey &&
+          e.key.toLowerCase() === "m"
+        ) {
+          e.preventDefault();
+          toggleMute();
+          return;
+        }
+
         if (e.code === "Space") {
           e.preventDefault();
           togglePlaybackFromDock();
@@ -1934,6 +2068,10 @@
         togglePlaybackFromDock();
       });
 
+      muteToggle.addEventListener("click", () => {
+        toggleMute();
+      });
+
       btnSignOut.addEventListener("click", async () => {
         try {
           if (!authReady) return;
@@ -1946,17 +2084,14 @@
         }
       });
 
-      const knobWrap = document.getElementById("knobWrap");
-      const knobIndicator = document.getElementById("knobIndicator");
-      const knobFill = document.getElementById("knobFill");
+      const volumeSlider = document.getElementById("volumeSlider");
       const volPct = document.getElementById("volPct");
       const volumeFlash = document.getElementById("volumeFlash");
       const volumeFlashValue = document.getElementById("volumeFlashValue");
 
-      let volume = 0.3;
-      let isDragging = false;
-      let dragStartY = 0;
-      let dragStartVol = 0;
+      let volume = 0.5;
+      let isMuted = false;
+      let isSliderDragging = false;
       function showVolumeFlash(pct) {
         volumeFlashValue.textContent = pct + "%";
         volumeFlash.classList.remove("active");
@@ -1967,78 +2102,69 @@
       function setVolume(v) {
         const prevPct = Math.round(volume * 100);
         volume = Math.min(1, Math.max(0, v));
-        if (currentAudio) currentAudio.volume = volume;
+        if (volume > 0 && isMuted) {
+          isMuted = false;
+        }
+        if (currentAudio) {
+          currentAudio.volume = volume;
+          currentAudio.muted = isMuted;
+        }
 
         const pct = Math.round(volume * 100);
-        const angleDeg = -140 + volume * 270;
-        knobIndicator.style.transform = `rotate(${angleDeg}deg)`;
-        volPct.textContent = pct + "%";
-
-        const startDeg = 30;
-        const fillEnd = startDeg + volume * 300;
-        knobFill.style.background = `conic-gradient(
-      transparent 0deg,
-      transparent ${startDeg}deg,
-      var(--accent) ${startDeg}deg,
-      var(--accent) ${fillEnd}deg,
-      transparent ${fillEnd}deg
+        volumeSlider.value = String(pct);
+        volumeSlider.style.background = `linear-gradient(
+      90deg,
+      var(--accent) 0%,
+      var(--accent) ${pct}%,
+      rgba(255, 255, 255, 0.12) ${pct}%,
+      rgba(255, 255, 255, 0.12) 100%
     )`;
+        volPct.textContent = pct + "%";
 
         if (pct !== prevPct) {
           showVolumeFlash(pct);
         }
+        updateMuteUi();
       }
 
-      knobWrap.addEventListener("mousedown", (e) => {
-        isDragging = true;
-        dragStartY = e.clientY;
-        dragStartVol = volume;
-        e.preventDefault();
+      function beginSliderDrag() {
+        if (isSliderDragging) return;
+        isSliderDragging = true;
+        volumeSlider.classList.add("dragging");
+      }
+
+      function endSliderDrag() {
+        if (!isSliderDragging) return;
+        isSliderDragging = false;
+        volumeSlider.classList.remove("dragging");
+      }
+
+      volumeSlider.addEventListener("input", (e) => {
+        setVolume(Number(e.target.value) / 100);
       });
 
-      knobWrap.addEventListener(
-        "touchstart",
-        (e) => {
-          isDragging = true;
-          dragStartY = e.touches[0].clientY;
-          dragStartVol = volume;
-        },
-        { passive: true },
-      );
-
-      document.addEventListener("mousemove", (e) => {
-        if (!isDragging) return;
-        const dy = dragStartY - e.clientY;
-        setVolume(dragStartVol + dy / 120);
+      volumeSlider.addEventListener("pointerdown", () => {
+        beginSliderDrag();
       });
 
-      document.addEventListener(
-        "touchmove",
-        (e) => {
-          if (!isDragging) return;
-          const dy = dragStartY - e.touches[0].clientY;
-          setVolume(dragStartVol + dy / 120);
-        },
-        { passive: true },
-      );
-
-      document.addEventListener("mouseup", () => {
-        isDragging = false;
-      });
-      document.addEventListener("touchend", () => {
-        isDragging = false;
+      volumeSlider.addEventListener("pointerup", () => {
+        endSliderDrag();
       });
 
-      knobWrap.addEventListener(
-        "wheel",
-        (e) => {
-          e.preventDefault();
-          setVolume(volume - e.deltaY / 800);
-        },
-        { passive: false },
-      );
+      volumeSlider.addEventListener("change", () => {
+        endSliderDrag();
+      });
 
-      setVolume(0.8);
+      volumeSlider.addEventListener("blur", () => {
+        endSliderDrag();
+      });
+
+      document.addEventListener("pointerup", () => {
+        endSliderDrag();
+      });
+
+      setVolume(0.5);
+      updateMuteUi();
       updateDockState();
       initAuth();
       updateAuthUi();
